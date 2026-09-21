@@ -1,12 +1,37 @@
-# Exemple de guardar dades a arxius #
+# MP0486-RA1 - PR1.2 Serialització d'objectes #
 
-En aquest projecte hi ha diversos exemples de com guardar dades en Java, cap a arxius de text, binaris, XML, CSV i objectes serialitzats
+[![Java CI with Maven](https://github.com/jpala4-ieti/DAM-M0486-RA1-PR1.2-Practica-Punt-Partida-26-27/actions/workflows/maven.yml/badge.svg)](https://github.com/jpala4-ieti/DAM-M0486-RA1-PR1.2-Practica-Punt-Partida-26-27/actions/workflows/maven.yml)
+
+Punt de partida de la pràctica PR1.2: dades primitives amb `DataOutputStream`/`DataInputStream`, serialització d'objectes amb `ObjectOutputStream`/`ObjectInputStream`, fitxers CSV i accés aleatori amb `RandomAccessFile`.
 
 ### Instruccions ###
 
-Primer posar en funcionament el servidor
+Cada exercici té una classe de partida al paquet `com.project` amb els mètodes que criden els tests marcats amb `// *************** CODI PRÀCTICA **********************/`. **No canvieu els noms de les classes ni les signatures d'aquests mètodes**: si ho feu, els tests no compilaran.
 
-Després executar el client i comprovar com els càlculs obtenen resultat des del servidor
+| Exercici | Classe de partida | Fitxer de dades |
+|---|---|---|
+| 0 | `PR120mainPersonesHashmap` | `data/PR120persones.dat` |
+| 1 | `PR121mainEscriu`, `PR121mainLlegeix` | `data/PR121HashMapData.ser` |
+| 2 | `PR122main` | `data/PR122persones.dat` |
+| 3 | `PR123mainTreballadors` | `data/PR123treballadors.csv` |
+| 4 | `PR124main` | `data/PR124estudiants.dat` |
+
+Classes de suport (ja fetes, no cal modificar-les):
+
+```
+    excepcions/IOFitxerExcepcio.java          Excepció pròpia que han de llançar els mètodes d'E/S
+    objectes/PR121hashmap.java                Classe serialitzable de l'exercici 1
+    objectes/PR122persona.java                Classe serialitzable de l'exercici 2
+    utilitats/UtilsCSV.java                   Utilitats per llegir/escriure/modificar CSV (exercici 3)
+    utilitats/UTF8Utils.java                  Truncar noms en UTF-8 sense tallar caràcters (exercici 4)
+    exemples/RandomAccessFilesVideojocsManager.java   Exemple complet de RandomAccessFile (base de l'exercici 4)
+```
+
+Tots els programes escriuen i llegeixen dins de la carpeta `data/` del projecte:
+
+```java
+String camiBase = System.getProperty("user.dir") + "/data/";
+```
 
 ### Compilació i funcionament ###
 
@@ -14,44 +39,50 @@ Cal el 'Maven' per compilar el projecte
 ```bash
 mvn clean
 mvn compile
+mvn clean compile test package
 ```
 
-Per executar el projecte a Windows cal
+Per executar una classe amb `main` a Windows
 ```bash
-.\run.ps1 com.project.Main
+.\run.ps1 com.project.PR120mainPersonesHashmap
 ```
 
-Per executar el projecte a Linux/macOS cal
+Per executar una classe amb `main` a Linux/macOS
 ```bash
-./run.sh com.project.Main
+./run.sh com.project.PR120mainPersonesHashmap
 ```
 
-Per fer anar classes específiques amb main:
+Per executar sense usar script propi, directament amb maven:
 ```bash
-.\run.ps1 com.project.EscripturaDadesPrimitives
-./run.sh com.project.EscripturaDadesPrimitives
+mvn compile exec:java -PrunMain "-Dexec.mainClass=com.project.PR124main"
 ```
 
-### Ordre recomanat d'estudi:
-
+### Execució de tests ###
+```bash
+# Executar TOTS els tests
+mvn test
+# Executar només els tests d'un exercici
+mvn test -Dtest=PR120mainPersonesHashmapTest
+mvn test -Dtest=PR121mainTest
+mvn test -Dtest=PR122mainTest
+mvn test -Dtest=PR123mainTreballadorsTest
+mvn test -Dtest=PR124mainTest
+# Tots els tests que comencin amb "PR12"
+mvn test -Dtest="PR12*"
 ```
-    GestioArxius.java
 
-    EscripturaArxiuWriter.java
-    LecturaArxiuScanner.java
+El repositori inclou un workflow de GitHub Actions (`.github/workflows/maven.yml`) que executa els tests a cada push: en el lliurament final el semàfor ha de quedar en verd.
 
-    EscripturaArxiuList.java
-    LecturaArxiuList.java
+### Entrega ###
 
-    EscripturaDadesPrimitives.java
-    LecturaDadesPrimitives.java
+* Repositori Git privat, compartit amb l'usuari `jpala4-ieti`.
+* Subdirectori `doc/` amb el fitxer `memoria.pdf` (l'enunciat en PDF amb el nom i l'enllaç al repositori emplenats).
+* A Moodle només s'ha de lliurar l'URL del repositori.
 
-    EscripturaObjectes.java
-    LecturaObjectes.java
+### Visual Studio Code: resseteig de l'entorn de programació Java ###
 
-    EscripturaLlistes.java
-    LecturaLlistes.java
+Si Visual Studio Code no es comporta com esperem i hem provat a solucionar-ho sense èxit podem provar aquestes dues solucions:
 
-    GestioCSV.java
-    GestioXML.java
-```
+* Recarregar la Finestra: Obre la Paleta de Comandes (**Ctrl+Maj+P**), escriu Developer: "**Reload Window**" i prem Enter.
+
+* Netejar l'Espai de Treball: Si recarregar no funciona, obre de nou la Paleta de Comandes (**Ctrl+Maj+P**), escriu "**Java: Clean Java Language Server Workspace**" i prem Enter. Se't demanarà que recarreguis i tornis a escanejar el projecte.

@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.RandomAccessFile;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -83,11 +82,9 @@ class RandomAccessFilesVideojocsManagerTest {
     @Test
     void testMidaRegistreCorrecte() throws IOException {
         // Verificar que la mida de cada registre sigui correcta
+        manager.afegirVideojoc(1, "Test Videojoc");
         File file = new File(manager.getFilePath());
-        try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
-            manager.afegirVideojoc(1, "Test Videojoc");
-            assertEquals(44, raf.length());  // 4 bytes per ID + 40 bytes per nom en UTF-8
-        }
+        assertEquals(44, file.length());  // 4 bytes per ID + 40 bytes per nom en UTF-8
     }
 
     @Test

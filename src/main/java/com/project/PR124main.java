@@ -58,6 +58,8 @@ public class PR124main {
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Si us plau, introdueix un número vàlid.");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
             } catch (IOException e) {
                 System.out.println("Error en la manipulació del fitxer: " + e.getMessage());
             }
@@ -110,7 +112,7 @@ public class PR124main {
      private int demanarRegistre() {
         System.out.print("Introdueix el número de registre (enter positiu): ");
         int registre = Integer.parseInt(scanner.nextLine());
-        if (registre < 0) {
+        if (registre <= 0) {
             throw new IllegalArgumentException("El número de registre ha de ser positiu.");
         }
         return registre;

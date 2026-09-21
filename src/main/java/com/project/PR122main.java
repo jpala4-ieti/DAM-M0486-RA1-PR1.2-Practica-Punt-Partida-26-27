@@ -32,7 +32,7 @@ public class PR122main {
     // Mètode per deserialitzar la llista de persones
     public static List<PR122persona> deserialitzarPersones() throws IOFitxerExcepcio {
         // *************** CODI PRÀCTICA **********************/
-        return new ArrayList(); // Substitueix pel teu
+        return new ArrayList<>(); // Substitueix pel teu
     }
 
 

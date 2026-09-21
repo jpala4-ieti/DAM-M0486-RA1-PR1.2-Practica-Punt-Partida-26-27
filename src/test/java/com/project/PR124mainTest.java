@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.RandomAccessFile;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -83,11 +82,9 @@ class PR124mainTest {
     @Test
     void testMidaRegistreCorrecte() throws IOException {
         // Verificar que la mida de cada registre sigui correcta (48 bytes)
+        gestor.afegirEstudiantFitxer(1, "Test", 5.0f);
         File file = new File(gestor.getFilePath());
-        try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
-            gestor.afegirEstudiantFitxer(1, "Test", 5.0f);
-            assertEquals(48, raf.length());  // Verifica la mida del fitxer
-        }
+        assertEquals(48, file.length());  // Verifica la mida del fitxer: 4 (int) + 40 (nom) + 4 (float)
     }
 
     @Test
