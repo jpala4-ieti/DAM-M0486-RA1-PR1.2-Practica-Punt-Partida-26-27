@@ -10,7 +10,8 @@ import java.util.List;
 
 public class UtilsCSV {
 
-    // Llegeix un fitxer CSV i el retorna com una llista de línies
+    // Llegeix un fitxer CSV i el retorna com una llista de línies.
+    // Retorna null si el fitxer no existeix o no es pot llegir.
     public static List<String> llegir(String camiFitxer) {
         List<String> resultat = null;
         try {
@@ -21,14 +22,12 @@ public class UtilsCSV {
         return resultat;
     }
 
-    // Escriu una llista de línies en un fitxer CSV
-    public static void escriure(String camiFitxer, List<String> csvLinies) {
+    // Escriu una llista de línies en un fitxer CSV.
+    // Propaga la IOException perquè qui crida pugui gestionar l'error
+    // (per exemple, embolcallant-la en una IOFitxerExcepcio).
+    public static void escriure(String camiFitxer, List<String> csvLinies) throws IOException {
         Path sortida = Paths.get(camiFitxer);
-        try {
-            Files.write(sortida, csvLinies, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            System.err.println("Error en escriure al fitxer CSV: " + e.getMessage());
-        }
+        Files.write(sortida, csvLinies, StandardCharsets.UTF_8);
     }
 
     // Transforma una línia separada per comes en un array

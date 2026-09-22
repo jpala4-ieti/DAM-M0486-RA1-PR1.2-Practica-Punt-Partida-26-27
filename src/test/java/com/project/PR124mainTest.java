@@ -150,6 +150,87 @@ class PR124mainTest {
     }
 
     @Test
+    void testTruncamentNoPartCaracterMultibyte() throws IOException {
+        // 39 bytes ASCII + 'é' (2 bytes) = 41 bytes: cal truncar just abans de la 'é',
+        // el registre ha de continuar ocupant 48 bytes i el nom no ha de contenir cap caràcter trencat
+        String nom = "abcdefghijklmnopqrstuvwxyzabcdefghijklm" + "é";
+        gestor.afegirEstudiantFitxer(1, nom, 5.0f);
+        gestor.afegirEstudiantFitxer(2, "Segon", 6.0f);
+
+        File file = new File(gestor.getFilePath());
+        assertEquals(2 * 48, file.length());
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outputStream));
+        try {
+            gestor.llistarEstudiantsFitxer();
+        } finally {
+            System.setOut(originalOut);
+        }
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Registre: 1, Nom: abcdefghijklmnopqrstuvwxyzabcdefghijklm, Nota: 5.0"));
+        assertTrue(output.contains("Registre: 2, Nom: Segon, Nota: 6.0"));
+        assertFalse(output.contains("\uFFFD"));  // cap caràcter de substitució (UTF-8 trencat)
+    }
+
+    @Test
+    void testLlistarSenseFitxer() throws IOException {
+        // Sense fitxer: llistar ha d'informar que no hi ha estudiants i no ha de llançar excepció
+        assertFalse(new File(gestor.getFilePath()).exists());
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outputStream));
+        try {
+            gestor.llistarEstudiantsFitxer();
+        } finally {
+            System.setOut(originalOut);
+        }
+
+        assertTrue(outputStream.toString().contains("No hi ha estudiants registrats."));
+    }
+
+    @Test
+    void testConsultarIActualitzarSenseFitxer() throws IOException {
+        // Sense fitxer: consultar i actualitzar han de mostrar "No s'ha trobat..." i no llançar excepció
+        assertFalse(new File(gestor.getFilePath()).exists());
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outputStream));
+        try {
+            gestor.consultarNotaFitxer(7);
+            gestor.actualitzarNotaFitxer(7, 5.0f);
+        } finally {
+            System.setOut(originalOut);
+        }
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("No s'ha trobat l'estudiant amb registre: 7"));
+        assertFalse(output.contains("Nota actualitzada correctament."));
+    }
+
+    @Test
+    void testAfegirRegistreDuplicat() throws IOException {
+        // Un número de registre repetit no s'ha d'afegir
+        gestor.afegirEstudiantFitxer(1, "Anna", 6.0f);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outputStream));
+        try {
+            gestor.afegirEstudiantFitxer(1, "Anna repetida", 9.0f);
+        } finally {
+            System.setOut(originalOut);
+        }
+
+        assertTrue(outputStream.toString().contains("Ja existeix un estudiant amb registre: 1"));
+        assertEquals(48, new File(gestor.getFilePath()).length());  // només un registre
+    }
+
+    @Test
     void testNomsAmbAccentsICaractersEspecials() throws IOException {
         gestor.afegirEstudiantFitxer(1, "José García", 8.5f);
         gestor.afegirEstudiantFitxer(2, "Renée O'Connor", 7.5f);

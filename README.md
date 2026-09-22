@@ -27,6 +27,15 @@ Classes de suport (ja fetes, no cal modificar-les):
     exemples/RandomAccessFilesVideojocsManager.java   Exemple complet de RandomAccessFile (base de l'exercici 4)
 ```
 
+Punts que convé tenir clars abans de començar (els tests els comproven):
+
+* **Exercici 0**: obriu el fitxer amb `FileInputStream`/`FileOutputStream` (el test comprova que la causa de l'`IOFitxerExcepcio` és una `FileNotFoundException`). Un `HashMap` no té mida fixa: escriviu primer el nombre d'entrades i després cada parella nom/edat.
+* **Exercici 2**: per detectar "Fitxer no trobat" captureu `FileNotFoundException` abans que `IOException`.
+* **Exercici 3**: un Id inexistent o una columna no vàlida han de provocar `IllegalArgumentException`; `UtilsCSV.escriure` propaga la `IOException` perquè la pugueu embolcallar en una `IOFitxerExcepcio`.
+* **Exercici 4**: el límit del nom és de **40 bytes UTF-8** (no de caràcters). `afegirEstudiantFitxer` mai no rebutja un nom llarg: el trunca amb `UTF8Utils.truncar`. Consultar o actualitzar sobre un fitxer inexistent mostra "No s'ha trobat..." sense llançar excepció, i un registre duplicat no s'afegeix.
+
+El repositori inclou un `.gitignore` que exclou `target/` i els fitxers `.dat`/`.ser` generats a `data/` (no cal pujar-los: es regeneren executant els programes).
+
 Tots els programes escriuen i llegeixen dins de la carpeta `data/` del projecte:
 
 ```java

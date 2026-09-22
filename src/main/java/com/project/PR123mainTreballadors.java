@@ -3,6 +3,7 @@ package com.project;
 import com.project.excepcions.IOFitxerExcepcio;
 import com.project.utilitats.UtilsCSV;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -41,6 +42,9 @@ public class PR123mainTreballadors {
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Si us plau, introdueix un número vàlid.");
+            } catch (IllegalArgumentException e) {
+                // Id inexistent o columna no vàlida (la llança modificarTreballador)
+                System.out.println("Error: " + e.getMessage());
             } catch (IOFitxerExcepcio e) {
                 System.err.println("Error: " + e.getMessage());
             }
@@ -79,7 +83,10 @@ public class PR123mainTreballadors {
         modificarTreballador(id, columna, nouValor);
     }
 
-    // Mètode que modifica treballador (per a tests i usuaris) llegint i escrivint sobre disc
+    // Mètode que modifica treballador (per a tests i usuaris) llegint i escrivint sobre disc.
+    // - Si l'Id no existeix o la columna no és vàlida ha de llançar IllegalArgumentException
+    //   amb un missatge descriptiu (el menú la captura).
+    // - Si hi ha problemes amb el fitxer ha de llançar IOFitxerExcepcio.
     public void modificarTreballador(String id, String columna, String nouValor) throws IOFitxerExcepcio {
         // *************** CODI PRÀCTICA **********************/
     }
@@ -88,7 +95,7 @@ public class PR123mainTreballadors {
     private List<String> llegirFitxerCSV() throws IOFitxerExcepcio {
         List<String> treballadorsCSV = UtilsCSV.llegir(filePath);
         if (treballadorsCSV == null) {
-            throw new IOFitxerExcepcio("Error en llegir el fitxer.");
+            throw new IOFitxerExcepcio("Error en llegir el fitxer: " + filePath);
         }
         return treballadorsCSV;
     }
@@ -97,8 +104,8 @@ public class PR123mainTreballadors {
     private void escriureFitxerCSV(List<String> treballadorsCSV) throws IOFitxerExcepcio {
         try {
             UtilsCSV.escriure(filePath, treballadorsCSV);
-        } catch (Exception e) {
-            throw new IOFitxerExcepcio("Error en escriure el fitxer.", e);
+        } catch (IOException e) {
+            throw new IOFitxerExcepcio("Error en escriure el fitxer: " + filePath, e);
         }
     }
 
@@ -106,5 +113,5 @@ public class PR123mainTreballadors {
     public static void main(String[] args) {
         PR123mainTreballadors programa = new PR123mainTreballadors();
         programa.iniciar();
-    }    
+    }
 }

@@ -93,12 +93,13 @@ class PR120mainPersonesHashmapTest {
     
     @Test
     void testEscriureFitxerAmbError() throws IOException {
-        // Preparació: Utilitzar el directori temporal proporcionat per JUnit
-        File fitxerAmbError = new File(directoriTemporal, "PR120persones.dat");
-    
-        // Assegura que el fitxer existeix i després elimina els permisos d'escriptura
-        assertTrue(fitxerAmbError.createNewFile());  // Crea el fitxer temporal
-        fitxerAmbError.setWritable(false);  // El fitxer no és escrivible ara
+        // Preparació: una ruta on és impossible escriure. En lloc de treure permisos
+        // (setWritable(false) no té efecte si els tests s'executen com a root, p. ex. en un
+        // contenidor Docker), fem servir com a "directori" pare un fitxer normal:
+        // obrir "bloqueig/PR120persones.dat" falla sempre, en qualsevol sistema.
+        File bloqueig = new File(directoriTemporal, "bloqueig");
+        assertTrue(bloqueig.createNewFile());  // 'bloqueig' és un fitxer, no un directori
+        File fitxerAmbError = new File(bloqueig, "PR120persones.dat");
     
         // Dades de prova
         HashMap<String, Integer> persones = new HashMap<>();
@@ -120,9 +121,8 @@ class PR120mainPersonesHashmapTest {
         assertNotNull(excepcio.getCause());
         assertTrue(excepcio.getCause() instanceof IOException);
     
-        // Restaurar la ruta original i permisos del fitxer
+        // Restaurar la ruta original
         PR120mainPersonesHashmap.setFilePath(filePathAnterior);
-        fitxerAmbError.setWritable(true);  // Restaurar el permís d'escriptura
     }
 
 }

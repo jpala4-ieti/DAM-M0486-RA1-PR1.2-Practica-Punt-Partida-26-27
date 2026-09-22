@@ -10,7 +10,8 @@ public class RandomAccessFilesVideojocsManager {
 
     // Constants que defineixen l'estructura d'un registre
     private static final int ID_SIZE = 4; // Número de registre: 4 bytes
-    private static final int NAME_MAX_BYTES = 40; // Nom: màxim 20 caràcters (40 bytes en UTF-8)
+    private static final int NAME_MAX_BYTES = 40; // Nom: 40 bytes reservats en UTF-8 (límit de BYTES, no de caràcters)
+    private static final int RECORD_SIZE = ID_SIZE + NAME_MAX_BYTES; // Cada registre ocupa sempre 44 bytes
 
     // Atribut per al path del fitxer
     private String filePath;
@@ -113,10 +114,10 @@ public class RandomAccessFilesVideojocsManager {
 
     // Funcions auxiliars per a la lectura i escriptura del nom amb UTF-8
     private String llegirNom(RandomAccessFile raf) throws IOException {
-        byte[] nomBytes = new byte[NAME_MAX_BYTES]; // Llegim fins a 40 bytes
-        raf.read(nomBytes);
+        byte[] nomBytes = new byte[NAME_MAX_BYTES];
+        raf.readFully(nomBytes); // Llegim exactament 40 bytes (read() podria llegir-ne menys)
 
-        // Convertim els bytes a cadena utilitzant UTF-8
+        // Convertim els bytes a cadena utilitzant UTF-8 i eliminem el farciment (bytes a zero)
         return new String(nomBytes, StandardCharsets.UTF_8).trim();
     }
 
@@ -124,15 +125,14 @@ public class RandomAccessFilesVideojocsManager {
         // Convertir el nom a bytes en UTF-8
         byte[] nomBytes = nom.getBytes(StandardCharsets.UTF_8);
 
-        // Si el nom ocupa més de 40 bytes, es talla adequadament
+        // Si el nom ocupa més de 40 bytes, es trunca sense partir cap caràcter multibyte
         if (nomBytes.length > NAME_MAX_BYTES) {
-            byte[] nomTruncat = UTF8Utils.truncar(nomBytes, NAME_MAX_BYTES);
-            raf.write(nomTruncat);
-        } else {
-            raf.write(nomBytes);  // Escriure els bytes
-            // Omplir si és necessari fins a 40 bytes
-            raf.write(new byte[NAME_MAX_BYTES - nomBytes.length]);
+            nomBytes = UTF8Utils.truncar(nomBytes, NAME_MAX_BYTES);
         }
+
+        // S'escriuen sempre exactament NAME_MAX_BYTES bytes: el nom + farciment amb zeros
+        raf.write(nomBytes);
+        raf.write(new byte[NAME_MAX_BYTES - nomBytes.length]);
     }
 
     // Mètode per trobar la posició d'un videojoc al fitxer segons el número de registre
